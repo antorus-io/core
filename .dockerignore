@@ -1,0 +1,36 @@
+# Exclude compiled Go binary and other executables
+core
+*.exe
+
+# Exclude Go-specific build artifacts and dependencies
+*.o
+*.a
+*.test
+*.prof
+vendor/
+
+# Exclude editor-specific files
+*~
+*.swp
+*.tmp
+
+# Exclude version control system files
+.git/
+.hg/
+.svn/
+
+# Exclude log files
+*.log
+
+# Exclude documentation files and READMEs
+*.md
+*.pdf
+/docs
+!/docs/openapi
+
+# Exclude IDE-specific directories
+.idea/
+
+# Exclude Docker-related files
+Dockerfile
+.dockerignore

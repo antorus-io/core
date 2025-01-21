@@ -1,0 +1,12 @@
+---
+services:
+  test:
+    build:
+      context: ../../
+      dockerfile: ./docker/test/Dockerfile
+      target: ${TARGET}
+    container_name: antorus-${TARGET}
+    restart: "no"
+    volumes:
+      - ../../:/srv/antorus
+      - ../../coverage:/srv/antorus/coverage

@@ -1,0 +1,35 @@
+---
+name: release
+
+on:
+  push:
+    branches:
+      - master
+  workflow_dispatch:
+
+jobs:
+  release:
+    outputs:
+      tag: ${{ steps.semantic-release.outputs.tag }}
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Use Node.js 20.8.1+
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20.8.1"
+
+      - name: Run semantic-release
+        id: semantic-release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          VERSION=$(npx semantic-release | grep 'The next release version is' | sed -E 's/.* ([[:digit:].]+)$/\1/')
+          if [ -z "$VERSION" ]; then
+            CURRENT_VERSION=$(git describe --abbrev=0 --tags)
+            VERSION=${CURRENT_VERSION#v}
+          fi
+          echo "tag=$VERSION" >> "$GITHUB_OUTPUT"

@@ -1,0 +1,19 @@
+---
+name: Docker Login action
+description: A reusable action for Docker Login to GitHub Container Registry.
+inputs:
+  username:
+    description: GitHub username for accessing the container registry.
+    required: true
+  password:
+    description: GitHub password for accessing the container registry.
+    required: true
+runs:
+  using: composite
+  steps:
+    - name: Login to GitHub Container Registry
+      uses: docker/login-action@v3
+      with:
+        registry: ghcr.io
+        username: "${{ inputs.username }}"
+        password: "${{ inputs.password }}"

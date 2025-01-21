@@ -1,0 +1,8 @@
+---
+services:
+  actionlint:
+    container_name: antorus-${TARGET}
+    image: ghcr.io/antorus-io/common/${TARGET}
+    restart: "no"
+    volumes:
+      - ../../../:/tmp/${TARGET}

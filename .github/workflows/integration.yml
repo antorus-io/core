@@ -1,0 +1,131 @@
+---
+name: integration
+
+on:
+  workflow_dispatch:
+  pull_request:
+  schedule:
+    - cron: "0 3 * * *"
+
+jobs:
+  actionlint:
+    name: actionlint
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Login to GitHub Container Registry
+        uses: ./.github/actions/docker-login
+        with:
+          username: ${{ github.actor }}
+          password: ${{ secrets.ANTORUS_CONTAINER_REGISTRY_PAT }}
+
+      - name: Run actionlint target
+        run: make lint/actionlint
+
+  golangci-lint:
+    name: golangci-lint
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Login to GitHub Container Registry
+        uses: ./.github/actions/docker-login
+        with:
+          username: ${{ github.actor }}
+          password: ${{ secrets.ANTORUS_CONTAINER_REGISTRY_PAT }}
+
+      - name: Run golangci-lint target
+        run: make lint/golangci-lint
+
+  hadolint:
+    name: hadolint
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Login to GitHub Container Registry
+        uses: ./.github/actions/docker-login
+        with:
+          username: ${{ github.actor }}
+          password: ${{ secrets.ANTORUS_CONTAINER_REGISTRY_PAT }}
+
+      - name: Run hadolint target
+        run: make lint/hadolint
+
+  yamllint:
+    name: yamllint
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Login to GitHub Container Registry
+        uses: ./.github/actions/docker-login
+        with:
+          username: ${{ github.actor }}
+          password: ${{ secrets.ANTORUS_CONTAINER_REGISTRY_PAT }}
+
+      - name: Run yamllint target
+        run: make lint/yamllint
+
+  audit:
+    name: audit
+    needs: ["actionlint", "golangci-lint", "hadolint", "yamllint"]
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Login to GitHub Container Registry
+        uses: ./.github/actions/docker-login
+        with:
+          username: ${{ github.actor }}
+          password: ${{ secrets.ANTORUS_CONTAINER_REGISTRY_PAT }}
+
+      - name: Audit application
+        run: make audit
+
+  build:
+    name: build
+    needs: ["audit"]
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Login to GitHub Container Registry
+        uses: ./.github/actions/docker-login
+        with:
+          username: ${{ github.actor }}
+          password: ${{ secrets.ANTORUS_CONTAINER_REGISTRY_PAT }}
+
+      - name: Build application
+        run: make build
+
+  test:
+    name: test
+    needs: ["build"]
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Login to GitHub Container Registry
+        uses: ./.github/actions/docker-login
+        with:
+          username: ${{ github.actor }}
+          password: ${{ secrets.ANTORUS_CONTAINER_REGISTRY_PAT }}
+
+      - name: Run unit tests
+        run: make test/unit

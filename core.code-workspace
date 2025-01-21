@@ -1,0 +1,43 @@
+{
+  "extensions": {
+    "recommendations": [
+      "editorconfig.editorconfig",
+      "golang.go",
+      "ms-azuretools.vscode-docker",
+      "ms-vscode.makefile-tools"
+    ]
+  },
+  "folders": [
+    {
+      "path": "."
+    }
+  ],
+  "launch": {
+    "version": "0.2.0",
+    "configurations": [
+      {
+        "host": "127.0.0.1",
+        "logOutput": "rpc",
+        "mode": "remote",
+        "name": "Attach",
+        "port": 2345,
+        "remotePath": "",
+        "request": "attach",
+        "showLog": true,
+        "trace": "log",
+        "type": "go"
+      }
+    ]
+  },
+  "settings": {
+    "editor.formatOnSave": true,
+    "go.lintFlags": [
+      "--fast"
+    ],
+    "go.lintOnSave": "workspace",
+    "go.lintTool": "golangci-lint",
+    "search.exclude": {
+      "**/vendor": true
+    },
+  }
+}
