@@ -22,10 +22,17 @@ const (
 type ApplicationConfig struct {
 	DatabaseConfig DatabaseConfig
 	Env            string
+	InitConfig     CoreInitConfig
 	Mode           ApplicationMode
 	Models         models.Models
 	Service        string
 	StorageConfig  StorageConfig
+}
+
+type CoreInitConfig struct {
+	Database bool
+	Logger   bool
+	Storage  bool
 }
 
 type DatabaseConfig struct {
@@ -47,12 +54,20 @@ type StorageConfig struct {
 	Type string
 }
 
-func Setup() *ApplicationConfig {
-	app := &ApplicationConfig{}
+func Setup(coreInitConfig CoreInitConfig) *ApplicationConfig {
+	app := &ApplicationConfig{
+		InitConfig: coreInitConfig,
+	}
 
-	app.setupDatabase()
+	if coreInitConfig.Database {
+		app.setupDatabase()
+	}
+
 	app.setupApplicationEnvironment()
-	app.setupStorageConfig()
+
+	if coreInitConfig.Storage {
+		app.setupStorageConfig()
+	}
 
 	return app
 }
