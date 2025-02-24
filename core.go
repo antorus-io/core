@@ -10,7 +10,7 @@ import (
 	"github.com/antorus-io/core/storage"
 )
 
-func Init(coreInitConfig config.CoreInitConfig) {
+func Init(coreInitConfig config.CoreInitConfig) *config.ApplicationConfig {
 	app := config.Setup(coreInitConfig)
 
 	if coreInitConfig.Database {
@@ -26,6 +26,8 @@ func Init(coreInitConfig config.CoreInitConfig) {
 	}
 
 	logs.Logger.Info("Successfully initialized Core module", "database", coreInitConfig.Database, "logger", coreInitConfig.Logger, "storage", coreInitConfig.Storage)
+
+	return app
 }
 
 func initDatabase(app *config.ApplicationConfig) {
@@ -47,7 +49,7 @@ func initDatabase(app *config.ApplicationConfig) {
 	// TODO: move this to individual services?
 	app.SetupModels(database.DatabaseInstance.GetPool())
 
-	tmpLogger.Info("Database connection pool established")
+	tmpLogger.Info("Database connection successfully initialized")
 }
 
 func initLogger(app *config.ApplicationConfig) {

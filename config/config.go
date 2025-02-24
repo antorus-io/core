@@ -60,7 +60,7 @@ func Setup(coreInitConfig CoreInitConfig) *ApplicationConfig {
 	}
 
 	if coreInitConfig.Database {
-		app.setupDatabase()
+		app.setupDatabaseConfig()
 	}
 
 	app.setupApplicationEnvironment()
@@ -86,7 +86,7 @@ func (app *ApplicationConfig) setupApplicationEnvironment() {
 	}
 }
 
-func (app *ApplicationConfig) setupDatabase() {
+func (app *ApplicationConfig) setupDatabaseConfig() {
 	app.DatabaseConfig.Driver = "postgres"
 	app.DatabaseConfig.Host = "postgres"
 	app.DatabaseConfig.MaxIdleConns = 15

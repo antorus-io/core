@@ -29,6 +29,8 @@ type LogHandler struct {
 
 func CreateLogger(app *config.ApplicationConfig) {
 	Logger = &LogHandler{app, slog.New(slog.NewJSONHandler(os.Stdout, nil))}
+
+	Logger.Info("Logger successfully initialized")
 }
 
 func (l *LogHandler) Debug(msg string, params ...any) {
