@@ -77,18 +77,22 @@ func (app *ApplicationConfig) SetupModels(pool *pgxpool.Pool) {
 }
 
 func (app *ApplicationConfig) setupApplicationEnvironment() {
-	app.Env = os.Getenv("APPLICATION_ENV")
+	app.Env = "ANONYMOUS_NATIVE_INSTANCE"
 	app.Mode = Development
 	app.Service = os.Getenv("SERVICE_NAME")
 
 	if os.Getenv("APPLICATION_MODE") == string(Production) {
 		app.Mode = Production
 	}
+
+	if os.Getenv("APPLICATION_ENV") != "" {
+		app.Env = os.Getenv("APPLICATION_ENV")
+	}
 }
 
 func (app *ApplicationConfig) setupDatabaseConfig() {
 	app.DatabaseConfig.Driver = "postgres"
-	app.DatabaseConfig.Host = "postgres"
+	app.DatabaseConfig.Host = "0.0.0.0"
 	app.DatabaseConfig.MaxIdleConns = 15
 	app.DatabaseConfig.MaxIdleTime = "15m"
 	app.DatabaseConfig.MaxOpenConns = 15
