@@ -25,7 +25,6 @@ type ApplicationConfig struct {
 	Mode           ApplicationMode
 	Models         models.Models
 	Service        string
-	Services       Services
 	StorageConfig  StorageConfig
 }
 
@@ -42,10 +41,6 @@ type DatabaseConfig struct {
 	User         string
 }
 
-type Services struct {
-	InfuraApiKey string
-}
-
 type StorageConfig struct {
 	Host string
 	Port string
@@ -57,7 +52,6 @@ func Setup() *ApplicationConfig {
 
 	app.setupDatabase()
 	app.setupApplicationEnvironment()
-	app.setupServices()
 	app.setupStorageConfig()
 
 	return app
@@ -141,16 +135,6 @@ func (app *ApplicationConfig) setupDatabase() {
 		}
 
 		app.DatabaseConfig.MaxOpenConns = int32(maxOpenConns)
-	}
-}
-
-func (app *ApplicationConfig) setupServices() {
-	if os.Getenv("INFURA_API_KEY") != "" {
-		app.Services.InfuraApiKey = os.Getenv("INFURA_API_KEY")
-	} else {
-		tmpLogger.Error("Missing environment variable: INFURA_API_KEY. Exiting now.")
-
-		os.Exit(1)
 	}
 }
 
