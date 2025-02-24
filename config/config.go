@@ -79,7 +79,7 @@ func (app *ApplicationConfig) SetupModels(pool *pgxpool.Pool) {
 func (app *ApplicationConfig) setupApplicationEnvironment() {
 	app.Env = "ANONYMOUS_NATIVE_INSTANCE"
 	app.Mode = Development
-	app.Service = os.Getenv("SERVICE_NAME")
+	app.Service = "UNKNOWN_SERVICE"
 
 	if os.Getenv("APPLICATION_MODE") == string(Production) {
 		app.Mode = Production
@@ -87,6 +87,10 @@ func (app *ApplicationConfig) setupApplicationEnvironment() {
 
 	if os.Getenv("APPLICATION_ENV") != "" {
 		app.Env = os.Getenv("APPLICATION_ENV")
+	}
+
+	if os.Getenv("SERVICE_NAME") != "" {
+		app.Service = os.Getenv("SERVICE_NAME")
 	}
 }
 
