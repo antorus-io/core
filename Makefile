@@ -56,3 +56,11 @@ test/unit:
 .PHONY: test/coverage
 test/coverage:
 	@TARGET=coverage docker compose --file=./docker/test/docker-compose.yml --project-name=antorus up --build --exit-code-from=test --remove-orphans
+
+## upgrade: run dependency upgrade command along with tidy and vendoring
+.PHONY: upgrade
+upgrade:
+	@go get -u ./... && \
+	go mod tidy && \
+	go mod vendor && \
+	go mod verify

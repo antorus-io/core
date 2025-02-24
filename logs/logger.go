@@ -37,7 +37,9 @@ func (l *LogHandler) Debug(msg string, params ...any) {
 
 	l.logger.Debug(msg, allParams...)
 
-	l.saveToDatabase(Debug, msg, params...)
+	if l.app.InitConfig.Database {
+		l.saveToDatabase(Debug, msg, params...)
+	}
 }
 
 func (l *LogHandler) Error(msg string, params ...any) {
@@ -46,7 +48,9 @@ func (l *LogHandler) Error(msg string, params ...any) {
 
 	l.logger.Error(msg, allParams...)
 
-	l.saveToDatabase(Error, msg, params...)
+	if l.app.InitConfig.Database {
+		l.saveToDatabase(Error, msg, params...)
+	}
 }
 
 func (l *LogHandler) Info(msg string, params ...any) {
@@ -55,7 +59,9 @@ func (l *LogHandler) Info(msg string, params ...any) {
 
 	l.logger.Info(msg, allParams...)
 
-	l.saveToDatabase(Info, msg, params...)
+	if l.app.InitConfig.Database {
+		l.saveToDatabase(Info, msg, params...)
+	}
 }
 
 func (l *LogHandler) Warn(msg string, params ...any) {
@@ -64,7 +70,9 @@ func (l *LogHandler) Warn(msg string, params ...any) {
 
 	l.logger.Warn(msg, allParams...)
 
-	l.saveToDatabase(Warn, msg, params...)
+	if l.app.InitConfig.Database {
+		l.saveToDatabase(Warn, msg, params...)
+	}
 }
 
 func (l *LogHandler) saveToDatabase(level LogLevel, msg string, ps ...any) {

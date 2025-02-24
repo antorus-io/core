@@ -10,14 +10,22 @@ import (
 	"github.com/antorus-io/core/storage"
 )
 
-func Init() {
-	app := config.Setup()
+func Init(coreInitConfig config.CoreInitConfig) {
+	app := config.Setup(coreInitConfig)
 
-	initDatabase(app)
-	initLogger(app)
-	initStorage(app)
+	if coreInitConfig.Database {
+		initDatabase(app)
+	}
 
-	logs.Logger.Info("Successfully initialized Core module")
+	if coreInitConfig.Logger {
+		initLogger(app)
+	}
+
+	if coreInitConfig.Storage {
+		initStorage(app)
+	}
+
+	logs.Logger.Info("Successfully initialized Core module", "database", coreInitConfig.Database, "logger", coreInitConfig.Logger, "storage", coreInitConfig.Storage)
 }
 
 func initDatabase(app *config.ApplicationConfig) {
