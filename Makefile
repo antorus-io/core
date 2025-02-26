@@ -10,10 +10,16 @@ audit:
 	@go mod verify
 	@go vet ./...
 
+## build: build project
+.PHONY: build
+build:
+	@TARGET=build docker compose --file=./docker/production/docker-compose.yml --project-name=antorus up --build --exit-code-from=build --remove-orphans
+
+
 ## clean: clean up build artifacts and temporary data
 .PHONY: clean
 clean:
-	@rm -rf coverage/
+	@rm -rf core coverage/ tmp/ vendor/
 
 ## lint/all: run all lint targets
 .PHONY: lint/all

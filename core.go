@@ -7,31 +7,36 @@ import (
 	"github.com/antorus-io/core/config"
 	"github.com/antorus-io/core/database"
 	"github.com/antorus-io/core/logs"
+	"github.com/antorus-io/core/server"
 	"github.com/antorus-io/core/storage"
 )
 
 func Init(coreInitConfig config.CoreInitConfig) *config.ApplicationConfig {
-	app := config.Setup(coreInitConfig)
+	appConfig := config.Setup(coreInitConfig)
 
 	if coreInitConfig.Database {
-		initDatabase(app)
+		initDatabase(appConfig)
 	}
 
 	if coreInitConfig.Logger {
-		initLogger(app)
+		initLogger(appConfig)
+	}
+
+	if coreInitConfig.Server {
+		initServer(appConfig)
 	}
 
 	if coreInitConfig.Storage {
-		initStorage(app)
+		initStorage(appConfig)
 	}
 
 	logs.Logger.Info("Successfully initialized Core module", "database", coreInitConfig.Database, "logger", coreInitConfig.Logger, "storage", coreInitConfig.Storage)
 
-	return app
+	return appConfig
 }
 
-func initDatabase(app *config.ApplicationConfig) {
-	err := database.CreateDatabase(app.DatabaseConfig)
+func initDatabase(appConfig *config.ApplicationConfig) {
+	err := database.CreateDatabase(appConfig.DatabaseConfig)
 	tmpLogger := slog.New(slog.NewJSONHandler(os.Stdout, nil))
 
 	if err != nil {
@@ -46,18 +51,27 @@ func initDatabase(app *config.ApplicationConfig) {
 		os.Exit(1)
 	}
 
-	// TODO: move this to individual services?
-	app.SetupModels(database.DatabaseInstance.GetPool())
+	appConfig.SetupModels(database.DatabaseInstance.GetPool())
 
 	tmpLogger.Info("Database connection successfully initialized")
 }
 
-func initLogger(app *config.ApplicationConfig) {
-	logs.CreateLogger(app)
+func initLogger(appConfig *config.ApplicationConfig) {
+	logs.CreateLogger(appConfig)
 }
 
-func initStorage(app *config.ApplicationConfig) {
-	err := storage.CreateStorage(app.StorageConfig)
+func initServer(appConfig *config.ApplicationConfig) {
+	server.NewServer(appConfig)
+
+	if err := server.ServerInstance.Serve(); err != nil {
+		logs.Logger.Error(err.Error())
+
+		os.Exit(1)
+	}
+}
+
+func initStorage(appConfig *config.ApplicationConfig) {
+	err := storage.CreateStorage(appConfig.StorageConfig)
 
 	if err != nil {
 		logs.Logger.Error("Error initializing storage", "error", err)

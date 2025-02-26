@@ -1,0 +1,11 @@
+---
+name: antorus
+
+services:
+  build:
+    build:
+      context: ../../
+      dockerfile: ./docker/production/Dockerfile
+      target: ${TARGET}
+    container_name: antorus-${TARGET}
+    restart: "no"

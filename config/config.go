@@ -2,8 +2,10 @@ package config
 
 import (
 	"log/slog"
+	"net/http"
 	"os"
 	"strconv"
+	"strings"
 
 	"github.com/antorus-io/core/models"
 	"github.com/jackc/pgx/v5/pgxpool"
@@ -11,6 +13,8 @@ import (
 
 // Provide a temporary logger as the proper one is not instantiated yet.
 var tmpLogger *slog.Logger = slog.New(slog.NewJSONHandler(os.Stdout, nil))
+
+const WILDCARD_ADDR = "0.0.0.0"
 
 type ApplicationMode string
 
@@ -25,6 +29,8 @@ type ApplicationConfig struct {
 	InitConfig     CoreInitConfig
 	Mode           ApplicationMode
 	Models         models.Models
+	Routes         RouteConfig
+	ServerConfig   ServerConfig
 	Service        string
 	StorageConfig  StorageConfig
 }
@@ -32,6 +38,7 @@ type ApplicationConfig struct {
 type CoreInitConfig struct {
 	Database bool
 	Logger   bool
+	Server   bool
 	Storage  bool
 }
 
@@ -48,6 +55,19 @@ type DatabaseConfig struct {
 	User         string
 }
 
+type Route struct {
+	Handler http.HandlerFunc
+	Path    string
+}
+type RouteConfig map[string]Route
+
+type ServerConfig struct {
+	Debug          string
+	Host           string
+	Port           string
+	TrustedOrigins []string
+}
+
 type StorageConfig struct {
 	Host string
 	Port string
@@ -55,83 +75,87 @@ type StorageConfig struct {
 }
 
 func Setup(coreInitConfig CoreInitConfig) *ApplicationConfig {
-	app := &ApplicationConfig{
+	appConfig := &ApplicationConfig{
 		InitConfig: coreInitConfig,
 	}
 
 	if coreInitConfig.Database {
-		app.setupDatabaseConfig()
+		appConfig.setupDatabaseConfig()
 	}
 
-	app.setupApplicationEnvironment()
+	appConfig.setupApplicationEnvironment()
+
+	if coreInitConfig.Server {
+		appConfig.setupServerConfig()
+	}
 
 	if coreInitConfig.Storage {
-		app.setupStorageConfig()
+		appConfig.setupStorageConfig()
 	}
 
-	return app
+	return appConfig
 }
 
-func (app *ApplicationConfig) SetupModels(pool *pgxpool.Pool) {
-	app.Models = models.NewModels(pool)
+func (appConfig *ApplicationConfig) SetupModels(pool *pgxpool.Pool) {
+	appConfig.Models = models.NewModels(pool)
 }
 
-func (app *ApplicationConfig) setupApplicationEnvironment() {
-	app.Env = "ANONYMOUS_NATIVE_INSTANCE"
-	app.Mode = Development
-	app.Service = "UNKNOWN_SERVICE"
+func (appConfig *ApplicationConfig) setupApplicationEnvironment() {
+	appConfig.Env = "ANONYMOUS_NATIVE_INSTANCE"
+	appConfig.Mode = Development
+	appConfig.Service = "UNKNOWN_SERVICE"
 
 	if os.Getenv("APPLICATION_MODE") == string(Production) {
-		app.Mode = Production
+		appConfig.Mode = Production
 	}
 
 	if os.Getenv("APPLICATION_ENV") != "" {
-		app.Env = os.Getenv("APPLICATION_ENV")
+		appConfig.Env = os.Getenv("APPLICATION_ENV")
 	}
 
 	if os.Getenv("SERVICE_NAME") != "" {
-		app.Service = os.Getenv("SERVICE_NAME")
+		appConfig.Service = os.Getenv("SERVICE_NAME")
 	}
 }
 
-func (app *ApplicationConfig) setupDatabaseConfig() {
-	app.DatabaseConfig.Driver = "postgres"
-	app.DatabaseConfig.Host = "0.0.0.0"
-	app.DatabaseConfig.MaxIdleConns = 15
-	app.DatabaseConfig.MaxIdleTime = "15m"
-	app.DatabaseConfig.MaxOpenConns = 15
-	app.DatabaseConfig.Name = "antorus"
-	app.DatabaseConfig.Password = "pass1234"
-	app.DatabaseConfig.Sslmode = "disable"
-	app.DatabaseConfig.Port = "5432"
-	app.DatabaseConfig.User = "antorus"
+func (appConfig *ApplicationConfig) setupDatabaseConfig() {
+	appConfig.DatabaseConfig.Driver = "postgres"
+	appConfig.DatabaseConfig.Host = WILDCARD_ADDR
+	appConfig.DatabaseConfig.MaxIdleConns = 15
+	appConfig.DatabaseConfig.MaxIdleTime = "15m"
+	appConfig.DatabaseConfig.MaxOpenConns = 15
+	appConfig.DatabaseConfig.Name = "antorus"
+	appConfig.DatabaseConfig.Password = "pass1234"
+	appConfig.DatabaseConfig.Sslmode = "disable"
+	appConfig.DatabaseConfig.Port = "5432"
+	appConfig.DatabaseConfig.User = "antorus"
 
 	if os.Getenv("DB_DRIVER") != "" {
-		app.DatabaseConfig.Driver = os.Getenv("DB_DRIVER")
+		appConfig.DatabaseConfig.Driver = os.Getenv("DB_DRIVER")
 	}
 
 	if os.Getenv("DB_HOST") != "" {
-		app.DatabaseConfig.Host = os.Getenv("DB_HOST")
+		appConfig.DatabaseConfig.Host = os.Getenv("DB_HOST")
 	}
 
 	if os.Getenv("DB_NAME") != "" {
-		app.DatabaseConfig.Name = os.Getenv("DB_NAME")
+		appConfig.DatabaseConfig.Name = os.Getenv("DB_NAME")
 	}
 
 	if os.Getenv("DB_PASSWORD") != "" {
-		app.DatabaseConfig.Password = os.Getenv("DB_PASSWORD")
+		appConfig.DatabaseConfig.Password = os.Getenv("DB_PASSWORD")
 	}
 
 	if os.Getenv("DB_PORT") != "" {
-		app.DatabaseConfig.Port = os.Getenv("DB_PORT")
+		appConfig.DatabaseConfig.Port = os.Getenv("DB_PORT")
 	}
 
 	if os.Getenv("DB_SSLMODE") != "" {
-		app.DatabaseConfig.Sslmode = os.Getenv("DB_SSLMODE")
+		appConfig.DatabaseConfig.Sslmode = os.Getenv("DB_SSLMODE")
 	}
 
 	if os.Getenv("DB_USER") != "" {
-		app.DatabaseConfig.User = os.Getenv("DB_USER")
+		appConfig.DatabaseConfig.User = os.Getenv("DB_USER")
 	}
 
 	if os.Getenv("DB_MAX_IDLE_CONNS") != "" {
@@ -141,11 +165,11 @@ func (app *ApplicationConfig) setupDatabaseConfig() {
 			tmpLogger.Error(err.Error())
 		}
 
-		app.DatabaseConfig.MaxIdleConns = maxIdleConns
+		appConfig.DatabaseConfig.MaxIdleConns = maxIdleConns
 	}
 
 	if os.Getenv("DB_MAX_IDLE_TIME") != "" {
-		app.DatabaseConfig.MaxIdleTime = os.Getenv("DB_MAX_IDLE_TIME")
+		appConfig.DatabaseConfig.MaxIdleTime = os.Getenv("DB_MAX_IDLE_TIME")
 	}
 
 	if os.Getenv("DB_MAX_OPEN_CONNS") != "" {
@@ -157,24 +181,47 @@ func (app *ApplicationConfig) setupDatabaseConfig() {
 			maxOpenConns = 15
 		}
 
-		app.DatabaseConfig.MaxOpenConns = int32(maxOpenConns)
+		appConfig.DatabaseConfig.MaxOpenConns = int32(maxOpenConns)
 	}
 }
 
-func (app *ApplicationConfig) setupStorageConfig() {
-	app.StorageConfig.Host = "0.0.0.0"
-	app.StorageConfig.Port = "6379"
-	app.StorageConfig.Type = "REDIS"
+func (appConfig *ApplicationConfig) setupServerConfig() {
+	appConfig.ServerConfig.Debug = "0"
+	appConfig.ServerConfig.Host = WILDCARD_ADDR
+	appConfig.ServerConfig.Port = "8080"
+	appConfig.ServerConfig.TrustedOrigins = []string{"https://antorus.io"}
+
+	if os.Getenv("DEBUG") != "" {
+		appConfig.ServerConfig.Debug = os.Getenv("DEBUG")
+	}
+
+	if os.Getenv("HOST") != "" {
+		appConfig.ServerConfig.Host = os.Getenv("HOST")
+	}
+
+	if os.Getenv("PORT") != "" {
+		appConfig.ServerConfig.Port = os.Getenv("PORT")
+	}
+
+	if os.Getenv("CORS_TRUSTED_ORIGINS") != "" {
+		appConfig.ServerConfig.TrustedOrigins = strings.Fields(os.Getenv("CORS_TRUSTED_ORIGINS"))
+	}
+}
+
+func (appConfig *ApplicationConfig) setupStorageConfig() {
+	appConfig.StorageConfig.Host = WILDCARD_ADDR
+	appConfig.StorageConfig.Port = "6379"
+	appConfig.StorageConfig.Type = "REDIS"
 
 	if os.Getenv("STORAGE_HOST") != "" {
-		app.StorageConfig.Host = os.Getenv("STORAGE_HOST")
+		appConfig.StorageConfig.Host = os.Getenv("STORAGE_HOST")
 	}
 
 	if os.Getenv("STORAGE_PORT") != "" {
-		app.StorageConfig.Port = os.Getenv("STORAGE_PORT")
+		appConfig.StorageConfig.Port = os.Getenv("STORAGE_PORT")
 	}
 
 	if os.Getenv("STORAGE_TYPE") != "" {
-		app.StorageConfig.Type = os.Getenv("STORAGE_TYPE")
+		appConfig.StorageConfig.Type = os.Getenv("STORAGE_TYPE")
 	}
 }
