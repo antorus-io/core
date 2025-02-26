@@ -14,11 +14,11 @@ func getRoutes(appConfig *config.ApplicationConfig) http.Handler {
 	mux.Handle("GET /metrics", expvar.Handler())
 
 	// Register dynamic routes
-	for _, route := range appConfig.Routes {
+	for _, route := range appConfig.ServerConfig.Routes {
 		mux.HandleFunc(route.Path, route.Handler)
 	}
 
-	mux.HandleFunc("/", wildcardHandler(appConfig.Routes))
+	mux.HandleFunc("/", wildcardHandler(appConfig.ServerConfig.Routes))
 
 	return recoverPanic(handleCors(appConfig, logRequest(commonHeaders(appConfig, mux))))
 }

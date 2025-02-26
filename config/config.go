@@ -29,7 +29,6 @@ type ApplicationConfig struct {
 	InitConfig     CoreInitConfig
 	Mode           ApplicationMode
 	Models         models.Models
-	Routes         RouteConfig
 	ServerConfig   ServerConfig
 	Service        string
 	StorageConfig  StorageConfig
@@ -38,7 +37,7 @@ type ApplicationConfig struct {
 type CoreInitConfig struct {
 	Database bool
 	Logger   bool
-	Server   bool
+	Server   RouteConfig
 	Storage  bool
 }
 
@@ -65,6 +64,7 @@ type ServerConfig struct {
 	Debug          string
 	Host           string
 	Port           string
+	Routes         RouteConfig
 	TrustedOrigins []string
 }
 
@@ -85,8 +85,8 @@ func Setup(coreInitConfig CoreInitConfig) *ApplicationConfig {
 
 	appConfig.setupApplicationEnvironment()
 
-	if coreInitConfig.Server {
-		appConfig.setupServerConfig()
+	if coreInitConfig.Server != nil {
+		appConfig.setupServerConfig(coreInitConfig.Server)
 	}
 
 	if coreInitConfig.Storage {
@@ -185,10 +185,11 @@ func (appConfig *ApplicationConfig) setupDatabaseConfig() {
 	}
 }
 
-func (appConfig *ApplicationConfig) setupServerConfig() {
+func (appConfig *ApplicationConfig) setupServerConfig(routes RouteConfig) {
 	appConfig.ServerConfig.Debug = "0"
 	appConfig.ServerConfig.Host = WILDCARD_ADDR
 	appConfig.ServerConfig.Port = "8080"
+	appConfig.ServerConfig.Routes = routes
 	appConfig.ServerConfig.TrustedOrigins = []string{"https://antorus.io"}
 
 	if os.Getenv("DEBUG") != "" {

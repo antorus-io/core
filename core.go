@@ -22,7 +22,7 @@ func Init(coreInitConfig config.CoreInitConfig) *config.ApplicationConfig {
 		initLogger(appConfig)
 	}
 
-	if coreInitConfig.Server {
+	if coreInitConfig.Server != nil {
 		initServer(appConfig)
 	}
 

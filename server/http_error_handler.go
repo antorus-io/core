@@ -8,7 +8,7 @@ import (
 	"github.com/antorus-io/core/utils"
 )
 
-func handleHttpError(w http.ResponseWriter, r *http.Request, inputError interface{}, statusCode int) {
+func HandleHttpError(w http.ResponseWriter, r *http.Request, inputError interface{}, statusCode int) {
 	var createdErrs []Error
 
 	switch e := inputError.(type) {

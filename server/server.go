@@ -56,13 +56,13 @@ func (server *Server) Serve() error {
 		shutdownError <- server.instance.Shutdown(ctx)
 	}()
 
-	logs.Logger.Info("Starting server instance", "address", server.instance.Addr, "service", server.service)
+	logs.Logger.Info("Starting server instance", "address", server.instance.Addr)
 
 	if err := server.instance.ListenAndServe(); err != nil {
 		return err
 	}
 
-	logs.Logger.Info("Server instance stopped", "address", server.instance.Addr, "service", server.service)
+	logs.Logger.Info("Server instance stopped", "address", server.instance.Addr)
 
 	return nil
 }

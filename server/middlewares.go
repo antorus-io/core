@@ -85,7 +85,7 @@ func recoverPanic(next http.Handler) http.Handler {
 			if err := recover(); err != nil {
 				w.Header().Set("Connection", "close")
 
-				handleHttpError(w, r, fmt.Errorf("%s", err), http.StatusInternalServerError)
+				HandleHttpError(w, r, fmt.Errorf("%s", err), http.StatusInternalServerError)
 			}
 		}()
 

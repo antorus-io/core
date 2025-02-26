@@ -32,9 +32,9 @@ func wildcardHandler(routes map[string]config.Route) http.HandlerFunc {
 		fmt.Println(requestPath)
 
 		if pathExists {
-			handleHttpError(w, r, MethodNotAllowed, http.StatusMethodNotAllowed)
+			HandleHttpError(w, r, MethodNotAllowed, http.StatusMethodNotAllowed)
 		} else {
-			handleHttpError(w, r, ResourceNotFound, http.StatusNotFound)
+			HandleHttpError(w, r, ResourceNotFound, http.StatusNotFound)
 		}
 	}
 }
