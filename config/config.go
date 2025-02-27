@@ -74,9 +74,9 @@ type StorageConfig struct {
 	Type string
 }
 
-func Setup(coreInitConfig CoreInitConfig) *ApplicationConfig {
+func Setup(coreInitConfig *CoreInitConfig) *ApplicationConfig {
 	appConfig := &ApplicationConfig{
-		InitConfig: coreInitConfig,
+		InitConfig: *coreInitConfig,
 	}
 
 	if coreInitConfig.Database {

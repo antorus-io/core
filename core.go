@@ -11,7 +11,7 @@ import (
 	"github.com/antorus-io/core/storage"
 )
 
-func Init(coreInitConfig config.CoreInitConfig) *config.ApplicationConfig {
+func Init(coreInitConfig *config.CoreInitConfig) *config.ApplicationConfig {
 	appConfig := config.Setup(coreInitConfig)
 
 	if coreInitConfig.Database {
@@ -29,8 +29,8 @@ func Init(coreInitConfig config.CoreInitConfig) *config.ApplicationConfig {
 	return appConfig
 }
 
-func StartServer(appConfig *config.ApplicationConfig, routes config.RouteConfig) error {
-	appConfig.ServerConfig.Routes = routes
+func StartServer(appConfig *config.ApplicationConfig, routes *config.RouteConfig) error {
+	appConfig.ServerConfig.Routes = *routes
 
 	server.NewServer(appConfig)
 
