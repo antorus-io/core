@@ -22,17 +22,23 @@ func Init(coreInitConfig config.CoreInitConfig) *config.ApplicationConfig {
 		initLogger(appConfig)
 	}
 
-	if coreInitConfig.Server != nil {
-		initServer(appConfig)
-	}
-
 	if coreInitConfig.Storage {
 		initStorage(appConfig)
 	}
 
-	logs.Logger.Info("Successfully initialized Core module", "database", coreInitConfig.Database, "logger", coreInitConfig.Logger, "storage", coreInitConfig.Storage)
-
 	return appConfig
+}
+
+func StartServer(appConfig *config.ApplicationConfig) error {
+	server.NewServer(appConfig)
+
+	if err := server.ServerInstance.Serve(); err != nil {
+		logs.Logger.Error("Server error", "error", err)
+
+		return err
+	}
+
+	return nil
 }
 
 func initDatabase(appConfig *config.ApplicationConfig) {
@@ -58,16 +64,6 @@ func initDatabase(appConfig *config.ApplicationConfig) {
 
 func initLogger(appConfig *config.ApplicationConfig) {
 	logs.CreateLogger(appConfig)
-}
-
-func initServer(appConfig *config.ApplicationConfig) {
-	server.NewServer(appConfig)
-
-	if err := server.ServerInstance.Serve(); err != nil {
-		logs.Logger.Error(err.Error())
-
-		os.Exit(1)
-	}
 }
 
 func initStorage(appConfig *config.ApplicationConfig) {

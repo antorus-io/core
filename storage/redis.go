@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"github.com/antorus-io/core/config"
+	"github.com/antorus-io/core/logs"
 	"github.com/redis/go-redis/v9"
 )
 
@@ -60,4 +61,26 @@ func (r *RedisStorage) Set(namespace string, id string, value string) error {
 	err := r.client.Set(r.ctx, fmt.Sprintf("%s:%s", namespace, id), value, 0).Err()
 
 	return err
+}
+
+func (r *RedisStorage) Subscribe(channel string, handler func(payload string)) error {
+	pubsub := r.client.Subscribe(r.ctx, channel)
+
+	logs.Logger.Info("Subscribed to Redis channel", "channel", channel)
+
+	go func() {
+		for {
+			msg, err := pubsub.ReceiveMessage(r.ctx)
+
+			if err != nil {
+				logs.Logger.Error("Error receiving Redis message", "error", err)
+
+				continue
+			}
+
+			handler(msg.Payload)
+		}
+	}()
+
+	return nil
 }
