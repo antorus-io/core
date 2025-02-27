@@ -25,13 +25,6 @@ func TestSerialize(t *testing.T) {
 
 // TestSerializeInvalidInput ensures that serialization panic is handled correctly
 func TestSerializeInvalidInput(t *testing.T) {
-	// Test struct for serialization
-	type testStruct struct {
-		Name  string `json:"name"`
-		Age   int    `json:"age"`
-		Email string `json:"email"`
-	}
-
 	defer func() {
 		if r := recover(); r == nil {
 			t.Errorf("Expected panic for unserializable input but got none")
