@@ -29,9 +29,7 @@ func Init(coreInitConfig *config.CoreInitConfig) *config.ApplicationConfig {
 	return appConfig
 }
 
-func StartServer(appConfig *config.ApplicationConfig, routes *config.RouteConfig) error {
-	appConfig.ServerConfig.Routes = *routes
-
+func StartServer(appConfig *config.ApplicationConfig) error {
 	server.NewServer(appConfig)
 
 	if err := server.ServerInstance.Serve(); err != nil {
