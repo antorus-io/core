@@ -67,7 +67,7 @@ func (r *RedisStorage) Publish(channel string, payload interface{}) error {
 	err = r.client.Publish(r.ctx, channel, string(data)).Err()
 
 	if err != nil {
-		return fmt.Errorf("Failed to publish message", "channel", channel, "error", err)
+		return err
 	}
 
 	return nil
