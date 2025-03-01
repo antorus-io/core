@@ -2,10 +2,10 @@ package storage
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 
 	"github.com/antorus-io/core/config"
-	"github.com/antorus-io/core/logs"
 	"github.com/redis/go-redis/v9"
 )
 
@@ -57,6 +57,22 @@ func (r *RedisStorage) Ping() error {
 	return err
 }
 
+func (r *RedisStorage) Publish(channel string, payload interface{}) error {
+	data, err := json.Marshal(payload)
+
+	if err != nil {
+		return fmt.Errorf("failed to marshal payload: %w", err)
+	}
+
+	err = r.client.Publish(r.ctx, channel, string(data)).Err()
+
+	if err != nil {
+		return fmt.Errorf("Failed to publish message", "channel", channel, "error", err)
+	}
+
+	return nil
+}
+
 func (r *RedisStorage) Set(namespace string, id string, value string) error {
 	err := r.client.Set(r.ctx, fmt.Sprintf("%s:%s", namespace, id), value, 0).Err()
 
@@ -66,15 +82,11 @@ func (r *RedisStorage) Set(namespace string, id string, value string) error {
 func (r *RedisStorage) Subscribe(channel string, handler func(payload string)) error {
 	pubsub := r.client.Subscribe(r.ctx, channel)
 
-	logs.Logger.Info("Subscribed to Redis channel", "channel", channel)
-
 	go func() {
 		for {
 			msg, err := pubsub.ReceiveMessage(r.ctx)
 
 			if err != nil {
-				logs.Logger.Error("Error receiving Redis message", "error", err)
-
 				continue
 			}
 

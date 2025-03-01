@@ -9,6 +9,7 @@ import (
 
 	"github.com/antorus-io/core/config"
 	"github.com/antorus-io/core/models"
+	"github.com/antorus-io/core/storage"
 )
 
 type LogLevel string
@@ -99,6 +100,10 @@ func (l *LogHandler) saveToDatabase(level LogLevel, msg string, ps ...any) {
 
 	if err != nil {
 		l.logger.Error("An error occurred during database operation", "error", err.Error())
+	}
+
+	if err := storage.StorageInstance.Publish(storage.LogEntryCreated, logEntry); err != nil {
+		l.logger.Error(err.Error())
 	}
 }
 
