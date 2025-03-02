@@ -26,6 +26,7 @@ func CreatePostgresDatabase(cfg config.DatabaseConfig) error {
 
 	db.Connection = pool
 	DatabaseInstance = db
+	DatabaseInitialized = true
 
 	return nil
 }

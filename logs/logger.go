@@ -22,6 +22,7 @@ const (
 )
 
 var Logger *LogHandler
+var LoggerInitialized = false
 
 type LogHandler struct {
 	app    *config.ApplicationConfig
@@ -30,6 +31,7 @@ type LogHandler struct {
 
 func CreateLogger(app *config.ApplicationConfig) {
 	Logger = &LogHandler{app, slog.New(slog.NewJSONHandler(os.Stdout, nil))}
+	LoggerInitialized = true
 
 	Logger.Info("Logger successfully initialized")
 }
@@ -102,8 +104,10 @@ func (l *LogHandler) saveToDatabase(level LogLevel, msg string, ps ...any) {
 		l.logger.Error("An error occurred during database operation", "error", err.Error())
 	}
 
-	if err := storage.StorageInstance.Publish(storage.LogEntryCreated, logEntry); err != nil {
-		l.logger.Error(err.Error())
+	if l.app.InitConfig.Storage && storage.StorageInitialized {
+		if err := storage.StorageInstance.Publish(storage.LogEntryCreated, logEntry); err != nil {
+			l.logger.Error(err.Error())
+		}
 	}
 }
 

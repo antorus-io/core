@@ -6,6 +6,8 @@ const (
 	Redis StorageType = "REDIS"
 )
 
+var StorageInitialized = false
+
 type StorageClient interface {
 	Get(key string) (*string, error)
 	Ping() error

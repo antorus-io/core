@@ -6,6 +6,8 @@ const (
 	Postgres = "POSTGRES"
 )
 
+var DatabaseInitialized = false
+
 // TODO: make arguments these DB-agnostic
 type Database interface {
 	Close()

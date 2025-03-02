@@ -33,6 +33,7 @@ func CreateRedisStorage(storageConfig config.StorageConfig) error {
 	}
 
 	StorageInstance = client
+	StorageInitialized = true
 
 	return nil
 }

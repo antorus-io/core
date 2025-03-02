@@ -15,6 +15,7 @@ import (
 )
 
 var ServerInstance *Server
+var ServerInitialized = false
 
 type Server struct {
 	instance *http.Server
@@ -35,6 +36,7 @@ func NewServer(appConfig *config.ApplicationConfig) {
 		instance: instance,
 		service:  appConfig.Service,
 	}
+	ServerInitialized = true
 }
 
 func (server *Server) Serve() error {
