@@ -5,7 +5,6 @@ import (
 	"net/http"
 
 	coreConfig "github.com/antorus-io/core/config"
-	"github.com/antorus-io/core/logs"
 )
 
 func commonHeaders(appConfig *coreConfig.ApplicationConfig, next http.Handler) http.Handler {
@@ -59,21 +58,6 @@ func handleCors(appConfig *coreConfig.ApplicationConfig, next http.Handler) http
 				}
 			}
 		}
-
-		next.ServeHTTP(w, r)
-	})
-}
-
-func logRequest(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		var (
-			ip     = r.RemoteAddr
-			proto  = r.Proto
-			method = r.Method
-			uri    = r.URL.RequestURI()
-		)
-
-		logs.Logger.Info("Received request", "ip", ip, "proto", proto, "method", method, "uri", uri)
 
 		next.ServeHTTP(w, r)
 	})
