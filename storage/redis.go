@@ -52,6 +52,28 @@ func (r *RedisStorage) Get(key string) (*string, error) {
 	return &result, nil
 }
 
+func (r *RedisStorage) GetAllFromNamespace(namespace string) (map[string]string, error) {
+	iter := r.client.Scan(r.ctx, 0, namespace+"*", 0).Iterator()
+	result := make(map[string]string)
+
+	for iter.Next(r.ctx) {
+		key := iter.Val()
+		value, err := r.client.Get(r.ctx, key).Result()
+
+		if err != nil {
+			return nil, err
+		}
+
+		result[key] = value
+	}
+
+	if err := iter.Err(); err != nil {
+		return nil, err
+	}
+
+	return result, nil
+}
+
 func (r *RedisStorage) Ping() error {
 	_, err := r.client.Ping(r.ctx).Result()
 
