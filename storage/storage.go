@@ -1,5 +1,7 @@
 package storage
 
+import "encoding/json"
+
 type StorageType string
 
 const (
@@ -10,8 +12,9 @@ var StorageInitialized = false
 
 type StorageClient interface {
 	Get(key string) (*string, error)
+	GetAllFromNamespace(namespace string) (map[string]json.RawMessage, error)
 	Ping() error
 	Publish(channel string, payload interface{}) error
-	Set(namespace string, id string, value string) error
+	Set(namespace string, id string, value any) error
 	Subscribe(channel string, handler func(string)) error
 }

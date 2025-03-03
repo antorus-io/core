@@ -6,16 +6,14 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-// TestDeserialize checks if Deserialize correctly converts JSON to a struct
 func TestDeserialize(t *testing.T) {
-	// Test struct for serialization/deserialization
 	type testStruct struct {
 		Name  string `json:"name"`
 		Age   int    `json:"age"`
 		Email string `json:"email"`
 	}
 
-	jsonData := `{"name":"Alice","age":25,"email":"alice@example.com"}`
+	jsonData := []byte(`{"name":"Alice","age":25,"email":"alice@example.com"}`)
 
 	var result testStruct
 
@@ -25,9 +23,7 @@ func TestDeserialize(t *testing.T) {
 	assert.Equal(t, expected, result, "Deserialized struct does not match expected output")
 }
 
-// TestDeserializeInvalidJSON ensures that invalid JSON causes a panic
 func TestDeserializeInvalidJSON(t *testing.T) {
-	// Test struct for serialization/deserialization
 	type testStruct struct {
 		Name  string `json:"name"`
 		Age   int    `json:"age"`
@@ -41,5 +37,5 @@ func TestDeserializeInvalidJSON(t *testing.T) {
 	}()
 
 	var result testStruct
-	Deserialize(`{"name":"Alice", "age": "invalid_number"}`, &result)
+	Deserialize([]byte(`{"name":"Alice", "age": "invalid_number"}`), &result)
 }

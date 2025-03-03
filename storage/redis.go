@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"strings"
 
 	"github.com/antorus-io/core/config"
 	"github.com/redis/go-redis/v9"
@@ -52,6 +53,29 @@ func (r *RedisStorage) Get(key string) (*string, error) {
 	return &result, nil
 }
 
+func (r *RedisStorage) GetAllFromNamespace(namespace string) (map[string]json.RawMessage, error) {
+	iter := r.client.Scan(r.ctx, 0, namespace+":*", 0).Iterator()
+	result := make(map[string]json.RawMessage)
+
+	for iter.Next(r.ctx) {
+		fullKey := iter.Val()
+		value, err := r.client.Get(r.ctx, fullKey).Result()
+
+		if err != nil {
+			return nil, err
+		}
+
+		keyWithoutNamespace := strings.TrimPrefix(fullKey, namespace+":")
+		result[keyWithoutNamespace] = json.RawMessage(value)
+	}
+
+	if err := iter.Err(); err != nil {
+		return nil, err
+	}
+
+	return result, nil
+}
+
 func (r *RedisStorage) Ping() error {
 	_, err := r.client.Ping(r.ctx).Result()
 
@@ -74,10 +98,21 @@ func (r *RedisStorage) Publish(channel string, payload interface{}) error {
 	return nil
 }
 
-func (r *RedisStorage) Set(namespace string, id string, value string) error {
-	err := r.client.Set(r.ctx, fmt.Sprintf("%s:%s", namespace, id), value, 0).Err()
+func (r *RedisStorage) Set(namespace string, id string, value any) error {
+	fullKey := namespace + ":" + id
 
-	return err
+	switch v := value.(type) {
+	case string:
+		return r.client.Set(r.ctx, fullKey, v, 0).Err()
+	default:
+		data, err := json.Marshal(value)
+
+		if err != nil {
+			return fmt.Errorf("failed to marshal value: %w", err)
+		}
+
+		return r.client.Set(r.ctx, fullKey, data, 0).Err()
+	}
 }
 
 func (r *RedisStorage) Subscribe(channel string, handler func(payload string)) error {
