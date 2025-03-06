@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/antorus-io/core/config"
+	"github.com/antorus-io/core/events"
 	"github.com/antorus-io/core/models"
 	"github.com/antorus-io/core/storage"
 )
@@ -104,9 +105,13 @@ func (l *LogHandler) saveToDatabase(level LogLevel, msg string, ps ...any) {
 		l.logger.Error("An error occurred during database operation", "error", err.Error())
 	}
 
-	if l.app.InitConfig.Storage && storage.StorageInitialized {
-		if err := storage.StorageInstance.Publish(storage.LogEntryCreated, logEntry); err != nil {
-			l.logger.Error(err.Error())
+	if l.app.InitConfig.Storage && storage.StorageInitialized && events.EventRegistryInitialized {
+		logEntryCreatedEvent, exists := events.GetEventRegistry().GetEvent("LOG_ENTRY_CREATED")
+
+		if exists {
+			if err := storage.StorageInstance.Publish(logEntryCreatedEvent.Key, logEntry); err != nil {
+				l.logger.Error(err.Error())
+			}
 		}
 	}
 }

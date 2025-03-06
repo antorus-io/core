@@ -7,6 +7,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/antorus-io/core/events"
 	"github.com/antorus-io/core/models"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
@@ -26,6 +27,7 @@ const (
 type ApplicationConfig struct {
 	DatabaseConfig DatabaseConfig
 	Env            string
+	Events         map[string]events.Event
 	InitConfig     CoreInitConfig
 	Mode           ApplicationMode
 	Models         models.Models
