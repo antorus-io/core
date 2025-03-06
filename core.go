@@ -1,11 +1,13 @@
 package core
 
 import (
+	"context"
 	"log/slog"
 	"os"
 
 	"github.com/antorus-io/core/config"
 	"github.com/antorus-io/core/database"
+	"github.com/antorus-io/core/events"
 	"github.com/antorus-io/core/logs"
 	"github.com/antorus-io/core/server"
 	"github.com/antorus-io/core/storage"
@@ -24,6 +26,10 @@ func Init(coreInitConfig *config.CoreInitConfig) *config.ApplicationConfig {
 
 	if coreInitConfig.Storage {
 		initStorage(appConfig)
+	}
+
+	if coreInitConfig.Database && coreInitConfig.Storage {
+		initEventRegistry(appConfig)
 	}
 
 	return appConfig
@@ -60,6 +66,16 @@ func initDatabase(appConfig *config.ApplicationConfig) {
 	appConfig.SetupModels(database.DatabaseInstance.GetPool())
 
 	tmpLogger.Info("Database connection successfully initialized")
+}
+
+func initEventRegistry(appConfig *config.ApplicationConfig) {
+	err := events.InitEventRegistry(context.Background(), database.DatabaseInstance.GetPool())
+
+	if err != nil {
+		logs.Logger.Error("Error initializing EventRegistry", "error", err)
+	}
+
+	appConfig.Events = events.GetEventRegistry().AllEvents()
 }
 
 func initLogger(appConfig *config.ApplicationConfig) {
