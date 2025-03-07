@@ -106,7 +106,7 @@ func (l *LogHandler) saveToDatabase(level LogLevel, msg string, ps ...any) {
 	}
 
 	if l.app.InitConfig.Storage && storage.StorageInitialized && events.EventRegistryInitialized {
-		logEntryCreatedEvent, exists := events.GetEventRegistry().GetEvent("LOG_ENTRY_CREATED")
+		logEntryCreatedEvent, exists := events.GetEventRegistry().GetEvent("log.entry.created")
 
 		if exists {
 			if err := storage.StorageInstance.Publish(logEntryCreatedEvent.Key, logEntry); err != nil {
