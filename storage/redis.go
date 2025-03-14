@@ -39,6 +39,16 @@ func CreateRedisStorage(storageConfig config.StorageConfig) error {
 	return nil
 }
 
+func (r *RedisStorage) Del(namespace string, key string) error {
+	_, err := r.client.Del(r.ctx, fmt.Sprintf("%s:%s", namespace, key)).Result()
+
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func (r *RedisStorage) Get(key string) (*string, error) {
 	result, err := r.client.Get(r.ctx, key).Result()
 
