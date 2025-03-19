@@ -8,7 +8,7 @@ on:
 jobs:
   actionlint:
     name: actionlint
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
 
     steps:
       - name: Checkout repository
@@ -25,7 +25,7 @@ jobs:
 
   golangci-lint:
     name: golangci-lint
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
 
     steps:
       - name: Checkout repository
@@ -42,7 +42,7 @@ jobs:
 
   hadolint:
     name: hadolint
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
 
     steps:
       - name: Checkout repository
@@ -59,7 +59,7 @@ jobs:
 
   yamllint:
     name: yamllint
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
 
     steps:
       - name: Checkout repository
@@ -77,7 +77,7 @@ jobs:
   audit:
     name: audit
     needs: ["actionlint", "golangci-lint", "hadolint", "yamllint"]
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
 
     steps:
       - name: Checkout repository
@@ -95,7 +95,7 @@ jobs:
   build:
     name: build
     needs: ["audit"]
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
 
     steps:
       - name: Checkout repository
@@ -113,7 +113,7 @@ jobs:
   test:
     name: test
     needs: ["build"]
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
 
     steps:
       - name: Checkout repository
