@@ -17,19 +17,11 @@ var tmpLogger *slog.Logger = slog.New(slog.NewJSONHandler(os.Stdout, nil))
 
 const WILDCARD_ADDR = "0.0.0.0"
 
-type ApplicationMode string
-
-const (
-	Development ApplicationMode = "DEVELOPMENT"
-	Production  ApplicationMode = "PRODUCTION"
-)
-
 type ApplicationConfig struct {
 	DatabaseConfig DatabaseConfig
 	Env            string
 	Events         map[string]events.Event
 	InitConfig     CoreInitConfig
-	Mode           ApplicationMode
 	Models         models.Models
 	ServerConfig   ServerConfig
 	Service        string
@@ -104,12 +96,7 @@ func (appConfig *ApplicationConfig) SetupModels(pool *pgxpool.Pool) {
 
 func (appConfig *ApplicationConfig) setupApplicationEnvironment() {
 	appConfig.Env = "ANONYMOUS_NATIVE_INSTANCE"
-	appConfig.Mode = Development
 	appConfig.Service = "UNKNOWN_SERVICE"
-
-	if os.Getenv("APPLICATION_MODE") == string(Production) {
-		appConfig.Mode = Production
-	}
 
 	if os.Getenv("APPLICATION_ENV") != "" {
 		appConfig.Env = os.Getenv("APPLICATION_ENV")

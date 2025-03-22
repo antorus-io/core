@@ -38,7 +38,7 @@ func CreateLogger(app *config.ApplicationConfig) {
 }
 
 func (l *LogHandler) Debug(msg string, params ...any) {
-	baseParams := []any{"applicationMode", string(l.app.Mode), "env", l.app.Env, "service", l.app.Service}
+	baseParams := []any{"env", l.app.Env, "service", l.app.Service}
 	allParams := append(baseParams, params...)
 
 	l.logger.Debug(msg, allParams...)
@@ -49,7 +49,7 @@ func (l *LogHandler) Debug(msg string, params ...any) {
 }
 
 func (l *LogHandler) Error(msg string, params ...any) {
-	baseParams := []any{"applicationMode", string(l.app.Mode), "env", l.app.Env, "service", l.app.Service}
+	baseParams := []any{"env", l.app.Env, "service", l.app.Service}
 	allParams := append(baseParams, params...)
 
 	l.logger.Error(msg, allParams...)
@@ -60,7 +60,7 @@ func (l *LogHandler) Error(msg string, params ...any) {
 }
 
 func (l *LogHandler) Info(msg string, params ...any) {
-	baseParams := []any{"applicationMode", string(l.app.Mode), "env", l.app.Env, "service", l.app.Service}
+	baseParams := []any{"env", l.app.Env, "service", l.app.Service}
 	allParams := append(baseParams, params...)
 
 	l.logger.Info(msg, allParams...)
@@ -71,7 +71,7 @@ func (l *LogHandler) Info(msg string, params ...any) {
 }
 
 func (l *LogHandler) Warn(msg string, params ...any) {
-	baseParams := []any{"applicationMode", string(l.app.Mode), "env", l.app.Env, "service", l.app.Service}
+	baseParams := []any{"env", l.app.Env, "service", l.app.Service}
 	allParams := append(baseParams, params...)
 
 	l.logger.Warn(msg, allParams...)
@@ -91,13 +91,12 @@ func (l *LogHandler) saveToDatabase(level LogLevel, msg string, ps ...any) {
 	}
 
 	logEntry := &models.LogEntry{
-		ApplicationMode: string(l.app.Mode),
-		Env:             l.app.Env,
-		Level:           string(level),
-		Message:         msg,
-		Params:          params,
-		Service:         l.app.Service,
-		Timestamp:       time.Now(),
+		Env:       l.app.Env,
+		Level:     string(level),
+		Message:   msg,
+		Params:    params,
+		Service:   l.app.Service,
+		Timestamp: time.Now(),
 	}
 	err = l.app.Models.LogEntries.Insert(logEntry)
 
