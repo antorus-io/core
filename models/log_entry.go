@@ -37,8 +37,7 @@ func (m LogEntryModel) Insert(l *LogEntry) error {
 			$3,
 			$4,
 			$5,
-			$6,
-			$7
+			$6
 		)
 		RETURNING id
 	`
