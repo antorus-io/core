@@ -178,7 +178,7 @@ func (appConfig *ApplicationConfig) setupServerConfig() {
 	appConfig.ServerConfig.Debug = "0"
 	appConfig.ServerConfig.Host = WILDCARD_ADDR
 	appConfig.ServerConfig.Port = "8080"
-	appConfig.ServerConfig.TrustedOrigins = []string{"https://antorus.io"}
+	appConfig.ServerConfig.TrustedOrigins = []string{"*"}
 
 	if os.Getenv("DEBUG") != "" {
 		appConfig.ServerConfig.Debug = os.Getenv("DEBUG")
@@ -192,8 +192,8 @@ func (appConfig *ApplicationConfig) setupServerConfig() {
 		appConfig.ServerConfig.Port = os.Getenv("PORT")
 	}
 
-	if os.Getenv("CORS_TRUSTED_ORIGINS") != "" {
-		appConfig.ServerConfig.TrustedOrigins = strings.Fields(os.Getenv("CORS_TRUSTED_ORIGINS"))
+	if origins := os.Getenv("CORS_TRUSTED_ORIGINS"); origins != "" {
+		appConfig.ServerConfig.TrustedOrigins = strings.Fields(origins)
 	}
 }
 
