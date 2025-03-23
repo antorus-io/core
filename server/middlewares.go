@@ -7,7 +7,7 @@ import (
 	coreConfig "github.com/antorus-io/core/config"
 )
 
-func commonHeaders(appConfig *coreConfig.ApplicationConfig, next http.Handler) http.Handler {
+func commonHeaders(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("X-Content-Type-Options", "nosniff")
 		w.Header().Set("Content-Type", "application/json")

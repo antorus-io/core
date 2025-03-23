@@ -20,5 +20,5 @@ func getRoutes(appConfig *config.ApplicationConfig) http.Handler {
 
 	mux.HandleFunc("/", wildcardHandler(appConfig.ServerConfig.Routes))
 
-	return recoverPanic(handleCors(appConfig, commonHeaders(appConfig, mux)))
+	return recoverPanic(handleCors(appConfig, commonHeaders(mux)))
 }
