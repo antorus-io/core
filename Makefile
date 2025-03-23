@@ -3,18 +3,16 @@
 help:
 	@sed -n 's/^##//p' ${MAKEFILE_LIST} | column -t -s ':' | sed -e 's/^/ /'
 
-## audit: tidy dependencies, vet
+## audit: audit dependencies, vet
 .PHONY: audit
 audit:
-	@go mod tidy
-	@go mod verify
-	@go vet ./...
+	@TARGET=audit docker compose --file=./docker/audit/docker-compose.yml pull && \
+	TARGET=audit docker compose --file=./docker/audit/docker-compose.yml --project-name=antorus up --build --exit-code-from=audit --remove-orphans
 
 ## build: build project
 .PHONY: build
 build:
 	@TARGET=build docker compose --file=./docker/production/docker-compose.yml --project-name=antorus up --build --exit-code-from=build --remove-orphans
-
 
 ## clean: clean up build artifacts and temporary data
 .PHONY: clean

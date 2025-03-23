@@ -1,0 +1,8 @@
+---
+services:
+  audit:
+    container_name: antorus-${TARGET}
+    image: ghcr.io/antorus-io/common/go-${TARGET}
+    restart: "no"
+    volumes:
+      - ../../:/tmp/${TARGET}
