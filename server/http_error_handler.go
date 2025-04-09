@@ -23,7 +23,7 @@ func HandleHttpError(w http.ResponseWriter, r *http.Request, inputError interfac
 
 		createdErrs = []Error{
 			{
-				Code:        InternalServerError.Error(),
+				Code:        ErrInternalServerError.Error(),
 				Description: fmt.Sprintf("Invalid error type: %s", e),
 			},
 		}
@@ -37,7 +37,7 @@ func HandleHttpError(w http.ResponseWriter, r *http.Request, inputError interfac
 	// Marshal and write the response
 	if err := utils.WriteJSON(w, statusCode, createErrorResponse(createdErrs), nil); err != nil {
 		loggedErr := Error{
-			Code:        InternalServerError.Error(),
+			Code:        ErrInternalServerError.Error(),
 			Description: "An error occurred during handling the error.",
 		}
 

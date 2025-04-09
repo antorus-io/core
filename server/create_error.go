@@ -19,14 +19,14 @@ func CreateError(inputErrors []error) []Error {
 	}
 
 	for _, err := range inputErrors {
-		appendError(err, BadRequestError, "Bad request error.", nil)
-		appendError(err, InternalServerError, "Internal server error.", nil)
-		appendError(err, MethodNotAllowed, "Method not allowed.", nil)
-		appendError(err, OperationConflict, "A conflict occurred during the operation.", nil)
-		appendError(err, ResourceNotFound, "The resource was not found.", nil)
+		appendError(err, ErrBadRequest, "Bad request error.", nil)
+		appendError(err, ErrInternalServerError, "Internal server error.", nil)
+		appendError(err, ErrMethodNotAllowed, "Method not allowed.", nil)
+		appendError(err, ErrOperationConflict, "A conflict occurred during the operation.", nil)
+		appendError(err, ErrResourceNotFound, "The resource was not found.", nil)
 
 		// Stop processing further errors if `MethodNotAllowed` is encountered.
-		if errors.Is(err, MethodNotAllowed) {
+		if errors.Is(err, ErrMethodNotAllowed) {
 			break
 		}
 	}
@@ -34,7 +34,7 @@ func CreateError(inputErrors []error) []Error {
 	// Add default unknown error in case the incoming error is not mapped.
 	if len(e) == 0 {
 		e = append(e, Error{
-			Code:        UnhandledError.Error(),
+			Code:        ErrUnhandledError.Error(),
 			Description: fmt.Sprintf("Unhandled error occurred: %s", inputErrors[0].Error()),
 		})
 	}

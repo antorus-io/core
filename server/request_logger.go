@@ -20,7 +20,7 @@ func logRequestError(w http.ResponseWriter, r *http.Request, err Error) {
 		}
 
 		// Provide stack trace for unhandled errors.
-		if err.Code == UnhandledError.Error() {
+		if err.Code == ErrUnhandledError.Error() {
 			trace := string(debug.Stack())
 			logFields = append(logFields, "trace", trace)
 		}
