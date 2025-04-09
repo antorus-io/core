@@ -12,8 +12,6 @@ func WriteJSON(w http.ResponseWriter, statusCode int, data interface{}, headers 
 		return err
 	}
 
-	response = append(response, '\n')
-
 	for key, value := range headers {
 		w.Header()[key] = value
 	}
