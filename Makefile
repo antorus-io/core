@@ -7,7 +7,7 @@ help:
 .PHONY: audit
 audit:
 	@TARGET=audit docker compose --file=./docker/audit/docker-compose.yml pull && \
-	TARGET=audit docker compose --file=./docker/audit/docker-compose.yml --project-name=antorus up --build --exit-code-from=audit --remove-orphans
+	TARGET=audit docker compose --file=./docker/audit/docker-compose.yml --project-name=antorus up --exit-code-from=audit --remove-orphans
 
 ## build: build project
 .PHONY: build
