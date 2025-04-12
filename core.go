@@ -39,7 +39,7 @@ func StartServer(appConfig *config.ApplicationConfig) error {
 	server.NewServer(appConfig)
 
 	if err := server.ServerInstance.Serve(); err != nil {
-		logs.Logger.Error("Server error", "error", err)
+		logs.Logger.Error("Server error", "error", err, "operationName", "StartServer")
 
 		return err
 	}
@@ -72,7 +72,7 @@ func initEventRegistry(appConfig *config.ApplicationConfig) {
 	err := events.InitEventRegistry(context.Background(), database.DatabaseInstance.GetPool())
 
 	if err != nil {
-		logs.Logger.Error("Error initializing EventRegistry", "error", err)
+		logs.Logger.Error("Error initializing EventRegistry", "error", err, "operationName", "initEventRegistry")
 	}
 
 	appConfig.Events = events.GetEventRegistry().AllEvents()
@@ -86,10 +86,10 @@ func initStorage(appConfig *config.ApplicationConfig) {
 	err := storage.CreateStorage(appConfig.StorageConfig)
 
 	if err != nil {
-		logs.Logger.Error("Error initializing storage", "error", err)
+		logs.Logger.Error("Error initializing storage", "error", err, "operationName", "initStorage")
 
 		os.Exit(1)
 	}
 
-	logs.Logger.Info("Storage connection successfully initialized")
+	logs.Logger.Info("Storage connection successfully initialized", "operationName", "initStorage")
 }

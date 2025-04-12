@@ -19,7 +19,7 @@ func HandleHttpError(w http.ResponseWriter, r *http.Request, inputError interfac
 		createdErrs = CreateError(e)
 
 	default:
-		logs.Logger.Error("Invalid error type", "type", e)
+		logs.Logger.Error("Invalid error type", "type", e, "operationName", "HandleHttpError")
 
 		createdErrs = []Error{
 			{
@@ -41,7 +41,7 @@ func HandleHttpError(w http.ResponseWriter, r *http.Request, inputError interfac
 			Description: "An error occurred during handling the error.",
 		}
 
-		logs.Logger.Error("An error occurred", "code", loggedErr.Code, "description", loggedErr.Description)
+		logs.Logger.Error("An error occurred", "code", loggedErr.Code, "description", loggedErr.Description, "operationName", "HandleHttpError")
 
 		w.WriteHeader(http.StatusInternalServerError)
 

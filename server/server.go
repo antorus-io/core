@@ -49,7 +49,7 @@ func (server *Server) Serve() error {
 
 		s := <-quit
 
-		logs.Logger.Info("Caught signal", "signal", s.String())
+		logs.Logger.Info("Caught signal", "signal", s.String(), "operationName", "Serve")
 
 		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 
@@ -58,13 +58,13 @@ func (server *Server) Serve() error {
 		shutdownError <- server.instance.Shutdown(ctx)
 	}()
 
-	logs.Logger.Info("Starting server instance", "address", server.instance.Addr)
+	logs.Logger.Info("Starting server instance", "address", server.instance.Addr, "operationName", "Serve")
 
 	if err := server.instance.ListenAndServe(); err != nil {
 		return err
 	}
 
-	logs.Logger.Info("Server instance stopped", "address", server.instance.Addr)
+	logs.Logger.Info("Server instance stopped", "address", server.instance.Addr, "operationName", "Serve")
 
 	return nil
 }
