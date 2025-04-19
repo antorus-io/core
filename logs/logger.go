@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/antorus-io/core/config"
+	"github.com/antorus-io/core/database"
 	"github.com/antorus-io/core/events"
 	"github.com/antorus-io/core/models"
 	"github.com/antorus-io/core/storage"
@@ -43,7 +44,7 @@ func (l *LogHandler) Debug(msg string, params ...any) {
 
 	l.logger.Debug(msg, allParams...)
 
-	if l.app.InitConfig.Database {
+	if database.DatabaseInitialized {
 		l.saveToDatabase(Debug, msg, params...)
 	}
 }
@@ -54,7 +55,7 @@ func (l *LogHandler) Error(msg string, params ...any) {
 
 	l.logger.Error(msg, allParams...)
 
-	if l.app.InitConfig.Database {
+	if database.DatabaseInitialized {
 		l.saveToDatabase(Error, msg, params...)
 	}
 }
@@ -65,7 +66,7 @@ func (l *LogHandler) Info(msg string, params ...any) {
 
 	l.logger.Info(msg, allParams...)
 
-	if l.app.InitConfig.Database {
+	if database.DatabaseInitialized {
 		l.saveToDatabase(Info, msg, params...)
 	}
 }
@@ -76,7 +77,7 @@ func (l *LogHandler) Warn(msg string, params ...any) {
 
 	l.logger.Warn(msg, allParams...)
 
-	if l.app.InitConfig.Database {
+	if database.DatabaseInitialized {
 		l.saveToDatabase(Warn, msg, params...)
 	}
 }
@@ -104,7 +105,7 @@ func (l *LogHandler) saveToDatabase(level LogLevel, msg string, ps ...any) {
 		l.logger.Error("An error occurred during database operation", "error", err.Error())
 	}
 
-	if l.app.InitConfig.Storage && storage.StorageInitialized && events.EventRegistryInitialized {
+	if storage.StorageInitialized && events.EventRegistryInitialized {
 		logEntryCreatedEvent, exists := events.GetEventRegistry().GetEvent("log.entry.created")
 
 		if exists {

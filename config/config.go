@@ -21,18 +21,10 @@ type ApplicationConfig struct {
 	DatabaseConfig DatabaseConfig
 	Env            string
 	Events         map[string]events.Event
-	InitConfig     CoreInitConfig
 	Models         models.Models
 	ServerConfig   ServerConfig
 	Service        string
 	StorageConfig  StorageConfig
-}
-
-type CoreInitConfig struct {
-	Database bool
-	Logger   bool
-	Server   bool
-	Storage  bool
 }
 
 type DatabaseConfig struct {
@@ -68,24 +60,13 @@ type StorageConfig struct {
 	Type string
 }
 
-func Setup(coreInitConfig *CoreInitConfig) *ApplicationConfig {
-	appConfig := &ApplicationConfig{
-		InitConfig: *coreInitConfig,
-	}
+func Setup() *ApplicationConfig {
+	appConfig := &ApplicationConfig{}
 
-	if coreInitConfig.Database {
-		appConfig.setupDatabaseConfig()
-	}
-
+	appConfig.setupDatabaseConfig()
 	appConfig.setupApplicationEnvironment()
-
-	if coreInitConfig.Server {
-		appConfig.setupServerConfig()
-	}
-
-	if coreInitConfig.Storage {
-		appConfig.setupStorageConfig()
-	}
+	appConfig.setupServerConfig()
+	appConfig.setupStorageConfig()
 
 	return appConfig
 }
