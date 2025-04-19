@@ -13,24 +13,15 @@ import (
 	"github.com/antorus-io/core/storage"
 )
 
-func Init(coreInitConfig *config.CoreInitConfig) *config.ApplicationConfig {
-	appConfig := config.Setup(coreInitConfig)
+func Init() *config.ApplicationConfig {
+	appConfig := config.Setup()
 
-	if coreInitConfig.Database {
-		initDatabase(appConfig)
-	}
+	initDatabase(appConfig)
+	initLogger(appConfig)
+	initStorage(appConfig)
+	initEventRegistry(appConfig)
 
-	if coreInitConfig.Logger {
-		initLogger(appConfig)
-	}
-
-	if coreInitConfig.Storage {
-		initStorage(appConfig)
-	}
-
-	if coreInitConfig.Database && coreInitConfig.Storage {
-		initEventRegistry(appConfig)
-	}
+	go initServer(appConfig)
 
 	return appConfig
 }
@@ -80,6 +71,14 @@ func initEventRegistry(appConfig *config.ApplicationConfig) {
 
 func initLogger(appConfig *config.ApplicationConfig) {
 	logs.CreateLogger(appConfig)
+}
+
+func initServer(applicationConfig *config.ApplicationConfig) {
+	if err := StartServer(applicationConfig); err != nil {
+		logs.Logger.Error("Server error", "error", err, "operationName", "initServer")
+
+		os.Exit(1)
+	}
 }
 
 func initStorage(appConfig *config.ApplicationConfig) {
